@@ -1,0 +1,158 @@
+{
+  "name": "Wiki_QA_App",
+  "intents": [],
+  "entities": [
+    {
+      "entity": "telegram_start",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "/start",
+          "synonyms": []
+        }
+      ],
+      "fuzzy_match": true
+    }
+  ],
+  "language": "ko",
+  "metadata": {
+    "api_version": {
+      "major_version": "v1",
+      "minor_version": "2018-09-20"
+    }
+  },
+  "skill_id": "314b5df0-6cd3-40f6-b6f3-85e4630cd870",
+  "webhooks": [
+    {
+      "url": "https://us-south.functions.cloud.ibm.com/api/v1/namespaces/hcp.kyoyoon%40gmail.com_dev/actions/wiki_qa_action?blocking=true",
+      "name": "main_webhook",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Basic MDQ3YmQzZTYtY2FlZC00YTc3LWI0OTQtZDljYzNlZWJmOGZiOjg0YldESFFxOGI1bUF6NHZCWlY0U1JQNEVYWHRSa1BJSkFZUE5RdXFsU0NHd2psSHE3MGFTeGhYZU55UTRWYXQ="
+        }
+      ]
+    }
+  ],
+  "dialog_nodes": [
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "답변이 존재하지 않습니다."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_2_1573879107682",
+      "conditions": "anything_else",
+      "dialog_node": "response_2_1573903134663",
+      "previous_sibling": "response_1_1573903134204"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "입력하신 질문에 대한 답변 -> <? $webhook_result_1.response.result.message ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_2_1573879107682",
+      "conditions": "$webhook_result_1",
+      "dialog_node": "response_1_1573903134204"
+    },
+    {
+      "type": "standard",
+      "title": "위키",
+      "actions": [
+        {
+          "name": "main_webhook",
+          "type": "webhook",
+          "parameters": {
+            "wiki_sentence": "<? input.text ?>"
+          },
+          "result_variable": "webhook_result_1"
+        }
+      ],
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "conditions": "true",
+      "dialog_node": "node_2_1573879107682",
+      "previous_sibling": "환영 인사"
+    },
+    {
+      "type": "standard",
+      "title": "Anything else",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "무슨 말인지 모르겠어요. 다시 한 번 말씀해주세요."
+              },
+              {
+                "text": "잘 이해가 안 가요."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "anything_else",
+      "dialog_node": "node_10_1573898016594",
+      "previous_sibling": "node_2_1573879107682"
+    },
+    {
+      "type": "standard",
+      "title": "환영 인사",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "안녕하세요. 위키 QA 봇입니다. 원하는 질문 아무거나 입력하신 후 엔터를 쳐보세요. 그에 맞는 답변을 드리겠습니다."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "welcome || @telegram_start",
+      "dialog_node": "환영 인사"
+    }
+  ],
+  "workspace_id": "314b5df0-6cd3-40f6-b6f3-85e4630cd870",
+  "counterexamples": [],
+  "system_settings": {
+    "tooling": {
+      "store_generic_responses": true
+    },
+    "disambiguation": {
+      "prompt": "당신이 의도한 것은",
+      "none_of_the_above_prompt": "해당 항목 없음"
+    },
+    "human_agent_assist": {
+      "prompt": "당신이 의도한 것은"
+    }
+  },
+  "learning_opt_out": false,
+  "status": "Available"
+}
