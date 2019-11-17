@@ -1,0 +1,298 @@
+{
+  "name": "Show_Last_Three_Tweets_App",
+  "intents": [
+    {
+      "intent": "twitter",
+      "examples": [
+        {
+          "text": "@blackmirror"
+        },
+        {
+          "text": "any news from twitter"
+        },
+        {
+          "text": "hey give me the last 3 tweets"
+        },
+        {
+          "text": "news on the event from twitter"
+        },
+        {
+          "text": "show me some news from twitter"
+        },
+        {
+          "text": "show me the last 3 tweets"
+        },
+        {
+          "text": "show me what social media is saying about the event"
+        },
+        {
+          "text": "some tweets"
+        },
+        {
+          "text": "twitter @account"
+        },
+        {
+          "text": "twitter messages"
+        },
+        {
+          "text": "twitts please"
+        },
+        {
+          "text": "what people is saying about the show"
+        },
+        {
+          "text": "what people is saying on twitter"
+        },
+        {
+          "text": "what the social media is telling about the event ?"
+        }
+      ],
+      "description": "what twitter is saying about the event"
+    }
+  ],
+  "entities": [
+    {
+      "entity": "sys-percentage",
+      "values": [],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "account",
+      "values": [
+        {
+          "type": "patterns",
+          "value": "accountNames",
+          "patterns": [
+            "@([A-Za-z0-9_]+)"
+          ]
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "sys-currency",
+      "values": [],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "sys-number",
+      "values": [],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "telegram_start",
+      "values": [
+        {
+          "type": "synonyms",
+          "value": "/start",
+          "synonyms": []
+        }
+      ],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "sys-person",
+      "values": [],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "sys-location",
+      "values": [],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "sys-date",
+      "values": [],
+      "fuzzy_match": true
+    },
+    {
+      "entity": "sys-time",
+      "values": [],
+      "fuzzy_match": true
+    }
+  ],
+  "language": "en",
+  "metadata": {
+    "api_version": {
+      "major_version": "v1",
+      "minor_version": "2018-09-20"
+    }
+  },
+  "skill_id": "7fbe8973-e990-47f0-92c2-113a0d709a69",
+  "webhooks": [
+    {
+      "url": "https://us-south.functions.cloud.ibm.com/api/v1/namespaces/hcp.kyoyoon%40gmail.com_dev/actions/last_three_tweets_action?blocking=true",
+      "name": "main_webhook",
+      "headers": [
+        {
+          "name": "Authorization",
+          "value": "Basic MDQ3YmQzZTYtY2FlZC00YTc3LWI0OTQtZDljYzNlZWJmOGZiOjg0YldESFFxOGI1bUF6NHZCWlY0U1JQNEVYWHRSa1BJSkFZUE5RdXFsU0NHd2psSHE3MGFTeGhYZU55UTRWYXQ="
+        }
+      ]
+    }
+  ],
+  "dialog_nodes": [
+    {
+      "type": "standard",
+      "title": "Account NOT Specified",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Can you specify an account name? e.g. \\@blackmirror \\@stranger_things etc."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_4_1573980293086",
+      "conditions": "true",
+      "dialog_node": "node_10_1573981085887",
+      "previous_sibling": "node_8_1573980610021"
+    },
+    {
+      "type": "standard",
+      "title": "Account Specified",
+      "parent": "node_4_1573980293086",
+      "actions": [
+        {
+          "name": "main_webhook",
+          "type": "webhook",
+          "parameters": {
+            "account": "$account"
+          },
+          "result_variable": "webhook_result_1"
+        }
+      ],
+      "metadata": {
+        "_customization": {
+          "mcr": true
+        }
+      },
+      "conditions": "$account",
+      "dialog_node": "node_8_1573980610021"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "I couldn't find the account - please try again with e.g. \\@blackmirror \\@stranger_things"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_8_1573980610021",
+      "conditions": "anything_else",
+      "dialog_node": "response_10_1573983781815",
+      "previous_sibling": "response_10_1573983780104"
+    },
+    {
+      "type": "response_condition",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Last Tweets for $account:<br> - <? $webhook_result_1.response.result.message[0] ?> <br> - <? $webhook_result_1.response.result.message[1] ?><br> - <? $webhook_result_1.response.result.message[2] ?>"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "parent": "node_8_1573980610021",
+      "conditions": "$webhook_result_1",
+      "dialog_node": "response_10_1573983780104"
+    },
+    {
+      "type": "standard",
+      "title": "Twitter - last three tweets",
+      "context": {
+        "account": "<? @account.literal ?>"
+      },
+      "next_step": {
+        "behavior": "jump_to",
+        "selector": "condition",
+        "dialog_node": "node_8_1573980610021"
+      },
+      "conditions": "#twitter",
+      "dialog_node": "node_4_1573980293086",
+      "previous_sibling": "Welcome"
+    },
+    {
+      "type": "standard",
+      "title": "Anything else",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "I didn't understand. You can try rephrasing."
+              },
+              {
+                "text": "Can you reword your statement? I'm not understanding."
+              },
+              {
+                "text": "I didn't get your meaning."
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "anything_else",
+      "dialog_node": "Anything else",
+      "previous_sibling": "node_4_1573980293086"
+    },
+    {
+      "type": "standard",
+      "title": "Welcome",
+      "output": {
+        "generic": [
+          {
+            "values": [
+              {
+                "text": "Hello. I'm your twitter assistant. How can I help you?"
+              }
+            ],
+            "response_type": "text",
+            "selection_policy": "sequential"
+          }
+        ]
+      },
+      "conditions": "welcome || @telegram_start",
+      "dialog_node": "Welcome"
+    }
+  ],
+  "workspace_id": "7fbe8973-e990-47f0-92c2-113a0d709a69",
+  "counterexamples": [],
+  "system_settings": {
+    "tooling": {
+      "store_generic_responses": true
+    },
+    "off_topic": {
+      "enabled": true
+    },
+    "disambiguation": {
+      "prompt": "Did you mean:",
+      "none_of_the_above_prompt": "None of the above"
+    },
+    "human_agent_assist": {
+      "prompt": "Did you mean:"
+    },
+    "spelling_auto_correct": true
+  },
+  "learning_opt_out": false,
+  "status": "Available"
+}
